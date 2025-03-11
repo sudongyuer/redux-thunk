@@ -4,7 +4,7 @@ Thunk [middleware](https://redux.js.org/tutorials/fundamentals/part-4-store#midd
 
 For complete usage instructions and useful patterns, see the [Redux docs **Writing Logic with Thunks** page](https://redux.js.org/usage/writing-logic-thunks).
 
-![GitHub Workflow Status](https://img.shields.io/github/workflow/status/reduxjs/redux-thunk/Tests)
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/reduxjs/redux-thunk/test.yml?branch=master)
 [![npm version](https://img.shields.io/npm/v/redux-thunk.svg?style=flat-square)](https://www.npmjs.com/package/redux-thunk)
 [![npm downloads](https://img.shields.io/npm/dm/redux-thunk.svg?style=flat-square)](https://www.npmjs.com/package/redux-thunk)
 
@@ -23,8 +23,8 @@ import filtersReducer from './features/filters/filtersSlice'
 const store = configureStore({
   reducer: {
     todos: todosReducer,
-    filters: filtersReducer
-  }
+    filters: filtersReducer,
+  },
 })
 
 // The thunk middleware was automatically added
@@ -40,7 +40,7 @@ npm install redux-thunk
 yarn add redux-thunk
 ```
 
-The thunk middleware is the default export.
+The thunk middleware is a named export.
 
 <details>
 <summary><b>More Details: Importing the thunk middleware</b></summary>
@@ -48,22 +48,13 @@ The thunk middleware is the default export.
 If you're using ES modules:
 
 ```js
-import thunk from 'redux-thunk' // no changes here 😀
+import { thunk } from 'redux-thunk'
 ```
 
-If you use Redux Thunk 2.x in a CommonJS environment,
-[don’t forget to add `.default` to your import](https://github.com/reduxjs/redux-thunk/releases/tag/v2.0.0):
-
-```diff
-- const thunk = require('redux-thunk')
-+ const thunk = require('redux-thunk').default
-```
-
-Additionally, since 2.x, we also support a
-[UMD build](https://unpkg.com/redux-thunk/dist/redux-thunk.min.js) for use as a global script tag:
+If you use Redux Thunk in a CommonJS environment:
 
 ```js
-const ReduxThunk = window.ReduxThunk
+const { thunk } = require('redux-thunk')
 ```
 
 </details>
@@ -73,7 +64,7 @@ Then, to enable Redux Thunk, use
 
 ```js
 import { createStore, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
+import { thunk } from 'redux-thunk'
 import rootReducer from './reducers/index'
 
 const store = createStore(rootReducer, applyMiddleware(thunk))
@@ -95,9 +86,9 @@ const store = configureStore({
   middleware: getDefaultMiddleware =>
     getDefaultMiddleware({
       thunk: {
-        extraArgument: myCustomApiService
-      }
-    })
+        extraArgument: myCustomApiService,
+      },
+    }),
 })
 
 // later
@@ -119,10 +110,10 @@ const store = configureStore({
       thunk: {
         extraArgument: {
           api: myCustomApiService,
-          otherValue: 42
-        }
-      }
-    })
+          otherValue: 42,
+        },
+      },
+    }),
 })
 
 // later
@@ -133,13 +124,10 @@ function fetchUser(id) {
 }
 ```
 
-If you're setting up the store by hand, the default `thunk` export has an attached `thunk.withExtraArgument()` function that should be used to generate the correct thunk middleware:
+If you're setting up the store by hand, the named export `withExtraArgument()` function should be used to generate the correct thunk middleware:
 
 ```js
-const store = createStore(
-  reducer,
-  applyMiddleware(thunk.withExtraArgument(api))
-)
+const store = createStore(reducer, applyMiddleware(withExtraArgument(api)))
 ```
 
 ## Why Do I Need This?
@@ -156,7 +144,7 @@ For more details on why thunks are useful, see:
 
 - **Redux docs: Writing Logic with Thunks**  
   https://redux.js.org/usage/writing-logic-thunks  
-  The official usage guide page on thunks. Covers why they exist, how the thunk middleware works, and uesful patterns for using thunks.
+  The official usage guide page on thunks. Covers why they exist, how the thunk middleware works, and useful patterns for using thunks.
 
 - **Stack Overflow: Dispatching Redux Actions with a Timeout**  
   http://stackoverflow.com/questions/35411423/how-to-dispatch-a-redux-action-with-a-timeout/35415559#35415559  
@@ -200,7 +188,7 @@ const INCREMENT_COUNTER = 'INCREMENT_COUNTER'
 
 function increment() {
   return {
-    type: INCREMENT_COUNTER
+    type: INCREMENT_COUNTER,
   }
 }
 
@@ -258,7 +246,7 @@ Promises to wait for each other’s completion:
 
 ```js
 import { createStore, applyMiddleware } from 'redux'
-import thunk from 'redux-thunk'
+import { thunk } from 'redux-thunk'
 import rootReducer from './reducers'
 
 // Note: this API requires redux@>=3.1.0
@@ -276,7 +264,7 @@ function makeASandwich(forPerson, secretSauce) {
   return {
     type: 'MAKE_SANDWICH',
     forPerson,
-    secretSauce
+    secretSauce,
   }
 }
 
@@ -285,14 +273,14 @@ function apologize(fromPerson, toPerson, error) {
     type: 'APOLOGIZE',
     fromPerson,
     toPerson,
-    error
+    error,
   }
 }
 
 function withdrawMoney(amount) {
   return {
     type: 'WITHDRAW',
-    amount
+    amount,
   }
 }
 
@@ -314,7 +302,7 @@ function makeASandwichWithSecretSauce(forPerson) {
   return function (dispatch) {
     return fetchSecretSauce().then(
       sauce => dispatch(makeASandwich(forPerson, sauce)),
-      error => dispatch(apologize('The Sandwich Shop', forPerson, error))
+      error => dispatch(apologize('The Sandwich Shop', forPerson, error)),
     )
   }
 }
@@ -351,16 +339,16 @@ function makeSandwichesForEverybody() {
       .then(() =>
         Promise.all([
           dispatch(makeASandwichWithSecretSauce('Me')),
-          dispatch(makeASandwichWithSecretSauce('My wife'))
-        ])
+          dispatch(makeASandwichWithSecretSauce('My wife')),
+        ]),
       )
       .then(() => dispatch(makeASandwichWithSecretSauce('Our kids')))
       .then(() =>
         dispatch(
           getState().myMoney > 42
             ? withdrawMoney(42)
-            : apologize('Me', 'The Sandwich Shop')
-        )
+            : apologize('Me', 'The Sandwich Shop'),
+        ),
       )
   }
 }
@@ -371,7 +359,7 @@ function makeSandwichesForEverybody() {
 store
   .dispatch(makeSandwichesForEverybody())
   .then(() =>
-    response.send(ReactDOMServer.renderToString(<MyApp store={store} />))
+    response.send(ReactDOMServer.renderToString(<MyApp store={store} />)),
   )
 
 // I can also dispatch a thunk async action from a component
@@ -397,7 +385,7 @@ class SandwichShop extends Component {
 }
 
 export default connect(state => ({
-  sandwiches: state.sandwiches
+  sandwiches: state.sandwiches,
 }))(SandwichShop)
 ```
 

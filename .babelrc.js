@@ -1,19 +1,19 @@
 const { NODE_ENV, BABEL_ENV } = process.env
 const cjs = NODE_ENV === 'test' || BABEL_ENV === 'commonjs'
 
-module.exports = {
+export default {
   presets: [
     [
       '@babel/preset-env',
       {
         targets: {
-          ie: 11
+          ie: 11,
         },
         loose: true,
-        modules: cjs ? 'cjs' : false
-      }
+        modules: cjs ? 'cjs' : false,
+      },
     ],
-    '@babel/preset-typescript'
+    '@babel/preset-typescript',
   ],
-  plugins: [cjs && ['@babel/transform-modules-commonjs']].filter(Boolean)
+  plugins: [cjs && ['@babel/transform-modules-commonjs']].filter(Boolean),
 }
